@@ -22,15 +22,11 @@ let getCRUD = (req, res) => {
 let postCRUD = async (req, res) => {
   let message = await CRUDservice.createNewUser(req.body);
   console.log(message);
-  return res.send('post-crud from sever');
+  return res.send('Đã thêm User!!');
 };
 
 let displayGetCRUD = async (req, res) => {
   let data = await CRUDservice.getAllUser();
-  // console.log('-------------');
-  // console.log(data);
-  // console.log('-------------');
-
   return res.render('displayCRUD.ejs', {
     dataTable: data,
   });
@@ -46,15 +42,27 @@ let getEditCRUD = async (req, res) => {
       userData: userData,
     });
   } else {
-    return res.send('Users ID not found!');
+    return res.send('Không tìm thấy User');
   }
 };
 
 let putCRUD = async (req, res) => {
   let data = req.body;
+  let allUsers = await CRUDservice.updateUserData(data);
+  return res.render('displayCRUD.ejs', {
+    dataTable: allUsers,
+  });
+};
 
-  await CRUDservice.updateUserData(data);
-  return res.send('Updated User"s info');
+let deleteCRUD = async (req, res) => {
+  let userId = req.query.id;
+
+  if (userId) {
+    await CRUDservice.deleteUserById(userId);
+    return res.send('Xóa User thành công!!');
+  } else {
+    return res.send('Không tìm thấy User');
+  }
 };
 
 module.exports = {
@@ -65,4 +73,5 @@ module.exports = {
   displayGetCRUD: displayGetCRUD,
   getEditCRUD: getEditCRUD,
   putCRUD: putCRUD,
+  deleteCRUD: deleteCRUD,
 };

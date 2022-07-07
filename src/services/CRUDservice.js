@@ -70,8 +70,62 @@ let getUserInfoByUserId = (userId) => {
 };
 
 let updateUserData = (data) => {
-  console.log('data from service');
-  console.log(data);
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        // tìm user trong db với điều kiện = id truyền vào
+        where: { id: data.id },
+      });
+      if (user) {
+        // nếu có user => update lại firstname/lastname/ address
+        user.firstName = data.firstName;
+        user.lastName = data.lastName;
+        user.address = data.address;
+
+        await user.save(); // after updating => await user.save() lưu thông tin
+
+        let allUsers = await db.User.findAll();
+        resolve(allUsers);
+      } else {
+        resolve();
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+// let deleteUserById = (userId) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       let user = await db.User.findOne({
+//         where: { id: userId },
+//       });
+//       if (user) {
+//         await user.destroy();
+//       }
+
+//       resolve(); // = return;
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+
+let deleteUserById = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { id: userId },
+      });
+      if (user) {
+        await user.destroy();
+      }
+      resolve();
+    } catch (e) {
+      reject(e);
+    }
+  });
 };
 
 module.exports = {
@@ -79,6 +133,7 @@ module.exports = {
   getAllUser,
   getUserInfoByUserId,
   updateUserData,
+  deleteUserById,
 };
 
 // Sử dụng new Promiss
