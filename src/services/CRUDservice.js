@@ -36,8 +36,49 @@ let hashUserPassword = (password) => {
     }
   });
 };
+
+let getAllUser = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let users = await db.User.findAll({
+        raw: true, // hiển thị những phần quan trọng
+      });
+      resolve(users);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let getUserInfoByUserId = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { id: userId },
+        raw: true,
+      });
+
+      if (user) {
+        resolve(user);
+      } else {
+        resolve({});
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let updateUserData = (data) => {
+  console.log('data from service');
+  console.log(data);
+};
+
 module.exports = {
   createNewUser,
+  getAllUser,
+  getUserInfoByUserId,
+  updateUserData,
 };
 
 // Sử dụng new Promiss

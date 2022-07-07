@@ -11,6 +11,10 @@ let initWebRoutes = (app) => {
   router.get('/crud', homeController.getCRUD);
   router.post('/post-crud', homeController.postCRUD);
 
+  router.get('/get-crud', homeController.displayGetCRUD);
+  router.get('/edit-crud', homeController.getEditCRUD);
+  router.put('/put-crud', homeController.putCRUD);
+
   router.get('/page', (req, res) => {
     return res.send('Hello World from PAGE');
   });
