@@ -8,6 +8,9 @@ let initWebRoutes = (app) => {
 
   router.get('/about', homeController.getAboutMe);
 
+  router.get('/crud', homeController.getCRUD);
+  router.post('/post-crud', homeController.postCRUD);
+
   router.get('/page', (req, res) => {
     return res.send('Hello World from PAGE');
   });
