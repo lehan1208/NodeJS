@@ -108,23 +108,23 @@ let createNewUser = (data) => {
           errCode: 1,
           errMessage: "Email has been used already",
         });
+      } else {
+        let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+        await db.User.create({
+          email: data.email,
+          password: hashPasswordFromBcrypt,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          address: data.address,
+          phoneNumber: data.phoneNumber,
+          gender: data.gender === "1" ? true : false,
+          roleId: data.role,
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "Tạo thành công tài khoản mới",
+        });
       }
-
-      let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-      await db.User.create({
-        email: data.email,
-        password: hashPasswordFromBcrypt,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        address: data.address,
-        phoneNumber: data.phoneNumber,
-        gender: data.gender === "1" ? true : false,
-        roleId: data.role,
-      });
-      resolve({
-        errCode: 0,
-        errMessage: "Tạo thành công tài khoản mới",
-      });
     } catch (e) {
       reject(e);
     }
