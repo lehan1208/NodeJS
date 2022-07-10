@@ -1,5 +1,5 @@
-import bcrypt from "bcryptjs";
-import db from "../models/index";
+import bcrypt from 'bcryptjs';
+import db from '../models/index';
 
 const salt = bcrypt.genSaltSync(10);
 let hashUserPassword = (password) => {
@@ -22,7 +22,7 @@ let handleUserLogin = (email, password) => {
       if (isExist) {
         let user = await db.User.findOne({
           where: { email: email },
-          attributes: ["email", "roleId", "password"],
+          attributes: ['email', 'roleId', 'password'],
           raw: true,
         });
 
@@ -32,17 +32,17 @@ let handleUserLogin = (email, password) => {
 
           if (check === true) {
             userData.errCode = 0;
-            userData.errMessage = "OK!";
+            userData.errMessage = 'OK!';
             // delete password from userData
             delete user.password;
             userData.user = user;
           } else {
             userData.errCode = 3;
-            userData.errMessage = "Wrong password!";
+            userData.errMessage = 'Wrong password!';
           }
         } else {
           userData.errCode = 2;
-          userData.errMessage = "User not found!";
+          userData.errMessage = 'User not found!';
         }
       } else {
         userData.errCode = 1;
@@ -76,16 +76,16 @@ let checkUserEmail = (userEmail) => {
 let getAllUsers = (userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let users = "";
-      if (userId === "ALL") {
+      let users = '';
+      if (userId === 'ALL') {
         users = await db.User.findAll({
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
       }
-      if (userId && userId !== "ALL") {
+      if (userId && userId !== 'ALL') {
         users = await db.User.findOne({
           where: { id: userId },
-          attributes: { exclude: ["password"] },
+          attributes: { exclude: ['password'] },
         });
       }
 
@@ -106,7 +106,7 @@ let createNewUser = (data) => {
       if (check === true) {
         resolve({
           errCode: 1,
-          errMessage: "Email has been used already",
+          errMessage: 'Email has been used already',
         });
       }
 
@@ -118,12 +118,12 @@ let createNewUser = (data) => {
         lastName: data.lastName,
         address: data.address,
         phoneNumber: data.phoneNumber,
-        gender: data.gender === "1" ? true : false,
+        gender: data.gender === '1' ? true : false,
         roleId: data.role,
       });
       resolve({
         errCode: 0,
-        errMessage: "Tạo thành công tài khoản mới",
+        errMessage: 'Tạo thành công tài khoản mới',
       });
     } catch (e) {
       reject(e);
@@ -140,7 +140,7 @@ let deleteUser = (userId) => {
       if (!user) {
         resolve({
           errCode: 2,
-          errMessage: "The User does not exist",
+          errMessage: 'The User does not exist',
         });
       }
 
@@ -149,7 +149,7 @@ let deleteUser = (userId) => {
       });
       resolve({
         errCode: 0,
-        errMessage: "The user has been deleted",
+        errMessage: 'The user has been deleted',
       });
     } catch (e) {
       reject(e);
@@ -163,7 +163,7 @@ let updateUserData = (data) => {
       if (!data.id) {
         resolve({
           errCode: 2,
-          errMessage: "Missing required parameters",
+          errMessage: 'Missing required parameters',
         });
       }
       let user = await db.User.findOne({
@@ -178,16 +178,39 @@ let updateUserData = (data) => {
 
         resolve({
           errCode: 0,
-          errMessage: "Updated Successfully!",
+          errMessage: 'Updated Successfully!',
         });
       } else {
         resolve({
           errCode: 1,
-          errMessage: "User not found!",
+          errMessage: 'User not found!',
         });
       }
     } catch (e) {
       reject;
+    }
+  });
+};
+
+let getAllCodeService = (typeInput) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!typeInput) {
+        resolve({
+          errCode: 1,
+          errMessage: 'Missing required parameters',
+        });
+      } else {
+        let res = {};
+        let allCode = await db.Allcodes.findAll({
+          where: { type: typeInput },
+        });
+        res.errCode = 0;
+        res.data = allCode;
+        resolve(res);
+      }
+    } catch (e) {
+      reject(e);
     }
   });
 };
@@ -198,4 +221,5 @@ module.exports = {
   createNewUser: createNewUser,
   deleteUser: deleteUser,
   updateUserData: updateUserData,
+  getAllCodeService: getAllCodeService,
 };
