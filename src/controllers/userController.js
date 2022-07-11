@@ -45,6 +45,7 @@ let handleCreateNewUser = async (req, res) => {
 };
 
 let handleDeleteUser = async (req, res) => {
+  console.log('This is req.body', req.body);
   if (!req.body.id) {
     return res.status(200).json({
       errCode: 1,
