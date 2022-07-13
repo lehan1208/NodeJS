@@ -21,7 +21,6 @@ let getCRUD = (req, res) => {
 // việc tạo user tốn tgian nên để tránh mất đồng bộ => async/await
 let postCRUD = async (req, res) => {
   let message = await CRUDservice.createNewUser(req.body);
-  console.log(message);
   return res.send('Đã thêm User!!');
 };
 
@@ -34,7 +33,6 @@ let displayGetCRUD = async (req, res) => {
 
 let getEditCRUD = async (req, res) => {
   let userId = req.query.id;
-  console.log(userId);
 
   if (userId) {
     let userData = await CRUDservice.getUserInfoByUserId(userId);

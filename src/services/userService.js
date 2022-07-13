@@ -62,6 +62,7 @@ let checkUserEmail = (userEmail) => {
       let user = await db.User.findOne({
         where: { email: userEmail },
       });
+
       if (user) {
         resolve(true);
       } else {
@@ -100,9 +101,7 @@ let createNewUser = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       // Check if user already existed?
-
       let check = await checkUserEmail(data.email);
-      console.log(data);
       if (check === true) {
         resolve({
           errCode: 1,

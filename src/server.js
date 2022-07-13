@@ -10,7 +10,6 @@ let app = express();
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
-  console.log('REQ.BODY FROM SERVER', req.body);
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   res.setHeader('Access-Control-Allow-Methods', '*');
