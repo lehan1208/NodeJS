@@ -13,8 +13,9 @@ let createNewUser = async (data) => {
         lastName: data.lastName,
         address: data.address,
         phoneNumber: data.phoneNumber,
-        gender: data.gender === '1' ? true : false,
+        gender: data.gender,
         roleId: data.role,
+        positionId: data.positionId,
       });
       resolve('Create new user success!!');
     } catch (e) {

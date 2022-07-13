@@ -40,6 +40,7 @@ let handleGetAllUsers = async (req, res) => {
 };
 
 let handleCreateNewUser = async (req, res) => {
+  console.log("🚀 ~ file: userController.js ~ line 45 ~ handleCreateNewUser ~ req.body", req.body)
   let message = await userService.createNewUser(req.body);
   return res.status(200).json(message);
 };
