@@ -24,6 +24,7 @@ let handleUserLogin = (email, password) => {
                     where: { email: email },
                     attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
                     raw: true,
+                   
                 });
 
                 if (user) {
@@ -211,7 +212,7 @@ let getAllCodeService = (typeInput) => {
                 });
             } else {
                 let res = {};
-                let allCode = await db.Allcodes.findAll({
+                let allCode = await db.Allcode.findAll({
                     where: { type: typeInput },
                 });
                 res.errCode = 0;
