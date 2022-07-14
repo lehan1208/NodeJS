@@ -117,7 +117,7 @@ let createNewUser = (data) => {
                 lastName: data.lastName,
                 address: data.address,
                 phoneNumber: data.phoneNumber,
-                gender: data.gender ,
+                gender: data.gender,
                 roleId: data.roleId,
                 positionId: data.positionId,
                 image: data.avatar,
@@ -171,6 +171,7 @@ let updateUserData = (data) => {
                 where: { id: data.id },
                 raw: false,
             });
+
             if (user) {
                 user.firstName = data.firstName;
                 user.lastName = data.lastName;
