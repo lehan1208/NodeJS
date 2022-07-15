@@ -10,10 +10,10 @@ const getTopDoctorHome = (limit) => {
                 attributes: {exclude: ['password']},
                 raw: true,
                 nest: true,
-                // include: [
-                //     { module: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi']},
-                //     { module: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi']},
-                // ],
+                include: [
+                    { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi']},
+                    { model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'valueVi']},
+                ],
             });
 
             resolve({
