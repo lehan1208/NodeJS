@@ -44,36 +44,6 @@ const getAllDoctor = (doctors) => {
     });
 };
 
-// const saveInfoDoctor = (inputData) => {
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             if (!inputData.id || !inputData.contentHTML || !inputData.contentMarkdown) {
-//                 resolve({
-//                     errCode: 1,
-//                     errMessage: 'Missing required fields',
-//                 });
-//             } else {
-//                 await db.Markdown.save({
-//                     contentHTML: inputData.contentHTML,
-//                     contentMarkdown: inputData.contentMarkdown,
-//                     description: inputData.description,
-//                     doctorId: inputData.doctorId,
-//                 });
-//                 resolve({
-//                     errCode: 0,
-//                     errMessage: 'Save info successfully!!',
-//                 });
-//             }
-//         } catch (err) {
-//             reject({
-//                 errCode: 1,
-//                 errMessage: 'Error from server...' + err,
-//             });
-//             // console.log('Something has been wrong!!!' + err);
-//         }
-//     });
-// };
-
 const saveInfoDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -100,4 +70,51 @@ const saveInfoDoctor = (inputData) => {
     });
 };
 
-module.exports = { getTopDoctorHome, getAllDoctor, saveInfoDoctor };
+const getDetailDoctorById = (inputId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!inputId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required fields',
+                });
+            } else {
+                let data = await db.User.findOne({
+                    where: { id: inputId },
+                    attributes: { exclude: ['password'] },
+                    raw: true,
+                    nest: true,
+                    include: [
+                        {
+                            model: db.Markdown,
+                            attributes: [
+                                'description',
+                                'contentMarkdown',
+                                'doctorId',
+                                'contentHTML',
+                            ],
+                        },
+                        {
+                            model: db.Allcode,
+                            as: 'positionData',
+                            attributes: ['valueEn', 'valueVi'],
+                        },
+                    ],
+                });
+
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+                if (!data) data = {};
+                resolve({
+                    errCode: 0,
+                    data: data,
+                });
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+module.exports = { getTopDoctorHome, getAllDoctor, saveInfoDoctor, getDetailDoctorById };
