@@ -1,4 +1,8 @@
 import db from '../models/index.js';
+import 'dotenv/config';
+import _ from 'lodash';
+
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 const getTopDoctorHome = (limit) => {
     return new Promise(async (resolve, reject) => {
@@ -87,12 +91,7 @@ const getDetailDoctorById = (inputId) => {
                     include: [
                         {
                             model: db.Markdown,
-                            attributes: [
-                                'description',
-                                'contentMarkdown',
-                                'doctorId',
-                                'contentHTML',
-                            ],
+                            attributes: ['description', 'contentMarkdown', 'doctorId', 'contentHTML'],
                         },
                         {
                             model: db.Allcode,
@@ -117,4 +116,87 @@ const getDetailDoctorById = (inputId) => {
     });
 };
 
-module.exports = { getTopDoctorHome, getAllDoctor, saveInfoDoctor, getDetailDoctorById };
+const bulkCreateSchedule = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.arrSchedule || !data.doctorId || !data.formattedDate) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required fields',
+                });
+            } else {
+                let schedule = data.arrSchedule;
+                if (schedule && schedule.length > 0) {
+                    schedule = schedule.map((item) => {
+                        item.maxNumber = MAX_NUMBER_SCHEDULE;
+                        return item;
+                    });
+                }
+
+                // get all existed data
+                let existing = await db.Schedule.findAll({
+                    where: { doctorId: data.doctorId, date: data.formattedDate },
+                    attributes: ['timeType', 'date', 'doctorId', 'maxNumber'],
+                    raw: true,
+                });
+
+                // compare difference
+                let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+                    return a.timeType === b.timeType && +a.date === +b.date;
+                });
+
+                // create data
+                if (toCreate && toCreate.length > 0) {
+                    await db.Schedule.bulkCreate(schedule);
+                }
+                resolve({
+                    errCode: 0,
+                    errMessage: 'Save schedule successfully!!',
+                });
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+const getScheduleByDate = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required fields',
+                });
+            } else {
+                let data = await db.Schedule.findAll({
+                    where: { doctorId: doctorId, date: date },
+                    raw: true,
+                    nest: true,
+                    include: [
+                        {
+                            model: db.Allcode,
+                            as: 'timeTypeData',
+                            attributes: ['valueEn', 'valueVi'],
+                        },
+                    ],
+                });
+                if (!data) data = [];
+                resolve({
+                    errCode: 0,
+                    data: data,
+                });
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+module.exports = {
+    getTopDoctorHome,
+    getAllDoctor,
+    saveInfoDoctor,
+    getDetailDoctorById,
+    bulkCreateSchedule,
+    getScheduleByDate,
+};
