@@ -51,18 +51,75 @@ const getAllDoctor = (doctors) => {
 const saveInfoDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+            if (
+                !inputData.doctorId ||
+                !inputData.contentHTML ||
+                !inputData.contentMarkdown ||
+                !inputData.selectedPrice ||
+                !inputData.selectedPayment ||
+                !inputData.selectedProvince ||
+                !inputData.nameClinic ||
+                !inputData.addressClinic ||
+                !inputData.note
+            ) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required fields',
                 });
             } else {
-                await db.Markdown.create({
-                    contentHTML: inputData.contentHTML,
-                    contentMarkdown: inputData.contentMarkdown,
-                    description: inputData.description,
-                    doctorId: inputData.doctorId,
+                // upsert  to MARKDOWN info table
+
+                let markDownInfo = await db.Markdown.findOne({
+                    where: { doctorId: inputData.doctorId },
+                    raw: false,
                 });
+                if (markDownInfo) {
+                    // update
+                    (markDownInfo.contentHTML = inputData.contentHTML),
+                        (markDownInfo.contentMarkdown = inputData.contentMarkdown),
+                        (markDownInfo.description = inputData.description),
+                        (markDownInfo.updateAt = new Date()),
+                        await markDownInfo.save();
+                } else {
+                    // create
+                    await db.Markdown.create({
+                        contentHTML: inputData.contentHTML,
+                        contentMarkdown: inputData.contentMarkdown,
+                        description: inputData.description,
+                        doctorId: inputData.doctorId,
+                    });
+                }
+
+                // upsert  to DOCTOR info table
+                let doctorInfo = await db.Doctor_Info.findOne({
+                    where: { doctorId: inputData.doctorId },
+                    raw: false,
+                });
+                console.log(inputData.doctorId);
+
+                if (doctorInfo) {
+                    // update
+                    (doctorInfo.doctorId = inputData.doctorId),
+                        (doctorInfo.priceId = inputData.selectedPrice.value),
+                        (doctorInfo.provinceId = inputData.selectedProvince.value),
+                        (doctorInfo.paymentId = inputData.selectedPayment.value),
+                        (doctorInfo.nameClinic = inputData.nameClinic),
+                        (doctorInfo.addressClinic = inputData.addressClinic),
+                        (doctorInfo.note = inputData.note),
+                        await doctorInfo.save();
+                } else {
+                    // create
+                    await db.Doctor_Info.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice.value,
+                        provinceId: inputData.selectedProvince.value,
+                        paymentId: inputData.selectedPayment.value,
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    });
+                }
+
                 resolve({
                     errCode: 0,
                     errMessage: 'Save info successfully!!',
