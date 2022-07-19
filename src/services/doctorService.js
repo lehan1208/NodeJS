@@ -254,6 +254,40 @@ const getScheduleByDate = (doctorId, date) => {
         }
     });
 };
+
+const getExtraInfoDoctorById = (doctorId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required fields',
+                });
+            } else {
+                let data = await db.Doctor_Info.findOne({
+                    where: { doctorId: doctorId },
+                    attributes: { exclude: ['id', 'doctorId'] },
+                    include: [
+                        { model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: false,
+                    nest: true,
+                });
+
+                if (!data) data = {};
+                resolve({
+                    errCode: 0,
+                    data: data,
+                });
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 module.exports = {
     getTopDoctorHome,
     getAllDoctor,
@@ -261,4 +295,5 @@ module.exports = {
     getDetailDoctorById,
     bulkCreateSchedule,
     getScheduleByDate,
+    getExtraInfoDoctorById,
 };
