@@ -8,12 +8,9 @@ module.exports = (sequelize, DataTypes) => {
          * The `models/index` file will call this method automatically.
          */
         static associate(models) {
-            Schedule.belongsTo(models.Allcode, {
-                foreignKey: 'timeType',
-                targetKey: 'keyMap',
-                as: 'timeTypeData',
-            });
+            Schedule.belongsTo(models.Allcode, { foreignKey: 'timeType', targetKey: 'keyMap', as: 'timeTypeData' });
             // define association here
+            Schedule.belongsTo(models.User, { foreignKey: 'doctorId', as: 'doctorData' });
         }
     }
     Schedule.init(

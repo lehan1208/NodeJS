@@ -5,7 +5,7 @@ import emailService from './emailService.js';
 const postBookAppointment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.email || !data.doctorId || !data.timeType || !data.date) {
+            if (!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameters',
@@ -13,9 +13,10 @@ const postBookAppointment = (data) => {
             } else {
                 await emailService.sendSimpleEmail({
                     receiverEmail: data.email,
-                    patientName: 'Hỏi Dân IT patient name',
-                    time: '8:00 - 9:00 Chủ nhật 24/07/2022',
-                    doctorName: 'Nguyễn Thọ Lộ',
+                    patientName: data.fullName,
+                    time: data.timeString,
+                    doctorName: data.doctorName,
+                    language: data.language,
                     redirectLink: 'https://bookingcare.vn/pho-giao-su-tien-si-bac-si-nguyen-tho-lo-d60.html',
                 });
 
