@@ -48,23 +48,42 @@ const getAllDoctor = (doctors) => {
     });
 };
 
+const checkRequiredFields = (inputData) => {
+    let arrFields = [
+        'doctorId',
+        'contentHTML',
+        'contentMarkdown',
+        'selectedPrice',
+        'selectedPayment',
+        'selectedProvince',
+        'nameClinic',
+        'addressClinic',
+        'note',
+        'specialtyId',
+    ];
+    let isValid = true;
+    let element = '';
+    for (let i = 0; i < arrFields.length; i++) {
+        if (!inputData[arrFields[i]]) {
+            isValid = false;
+            element = arrFields[i];
+            break;
+        }
+    }
+    return {
+        isValid: isValid,
+        element: element,
+    };
+};
+
 const saveInfoDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (
-                !inputData.doctorId ||
-                !inputData.contentHTML ||
-                !inputData.contentMarkdown ||
-                !inputData.selectedPrice ||
-                !inputData.selectedPayment ||
-                !inputData.selectedProvince ||
-                !inputData.nameClinic ||
-                !inputData.addressClinic ||
-                !inputData.note
-            ) {
+            let checkObj = checkRequiredFields(inputData);
+            if (checkObj.isValid === false) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Missing required fields',
+                    errMessage: `Missing required fields ${checkObj.element}`,
                 });
             } else {
                 // upsert  to MARKDOWN info table
@@ -106,7 +125,9 @@ const saveInfoDoctor = (inputData) => {
                         (doctorInfo.nameClinic = inputData.nameClinic),
                         (doctorInfo.addressClinic = inputData.addressClinic),
                         (doctorInfo.note = inputData.note),
-                        await doctorInfo.save();
+                        (doctorInfo.specialtyId = inputData.specialtyId);
+                    doctorInfo.clinicId = inputData.clinicId;
+                    await doctorInfo.save();
                 } else {
                     // create
                     await db.Doctor_Info.create({
@@ -117,6 +138,8 @@ const saveInfoDoctor = (inputData) => {
                         nameClinic: inputData.nameClinic,
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
+                        specialtyId: inputData.specialtyId,
+                        clinicId: inputData.clinicId,
                     });
                 }
 
