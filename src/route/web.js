@@ -38,6 +38,7 @@ let initWebRoutes = (app) => {
 
     router.post('/api/create-specialty', specialtyController.createSpecialty);
     router.get('/api/get-all-specialty', specialtyController.getAllSpecialty);
+    router.get('/api/get-detail-specialty-by-id', specialtyController.getDetailSpecialtyById);
 
     router.get('/page', (req, res) => {
         return res.send('Hello World from PAGE');
