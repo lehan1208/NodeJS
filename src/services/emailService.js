@@ -63,6 +63,63 @@ const getBodyHTMLEmail = (dataSend) => {
     return result;
 };
 
+const sendAttachmentEmail = async (dataSend) => {
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+            user: process.env.EMAIL_APP, // generated ethereal user
+            pass: process.env.EMAIL_APP_PASSWORD, // generated ethereal password
+        },
+    });
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+        from: '"Hoc Lap Trinh" <silversoul.j@gmail.com>', // sender address
+        to: dataSend.email, // list of receivers
+        subject: 'Kết quả đặt lịch khám bệnh', // Subject line
+        html: getBodyHTMLEmailRemedy(dataSend),
+        attachments: [
+            {
+                // encoded string as an attachment
+                filename: `Remedy - ${dataSend.patientId} -  ${dataSend.patientName} -${new Date()}.png`,
+                content: dataSend.imageBase64.split('base64,')[1],
+                encoding: 'base64',
+            },
+        ],
+
+        // html body
+    });
+
+    console.log('Message sent: %s', info.messageId);
+    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+};
+
+const getBodyHTMLEmailRemedy = (dataSend) => {
+    let result = '';
+    if (dataSend.language === 'vi') {
+        result = `
+        <h3>Xin chào ${dataSend.patientName}</h3>
+        <p>Bạn nhận được email này vì đã đặt lịch hẹn trên Bookingcare.vn thành công</p>
+        <p>Thông tin đặt đơn thuốc/ hóa đơn được gửi trong file đính kèm:</p>
+
+        <div>Xin chân thành cảm ơn!</div>
+        `;
+    }
+    if (dataSend.language === 'en') {
+        result = `
+        <h3>Dear ${dataSend.patientName}</h3>
+        <p>You received this email because you booked an appointment on Bookingcare.vn successfully</p>
+        <p>Ordering information / invoices are sent in the attached file:</p>
+       
+        <div>Sincerely,</div>
+        `;
+    }
+    return result;
+};
+
 module.exports = {
     sendSimpleEmail: sendSimpleEmail,
+    sendAttachmentEmail,
 };

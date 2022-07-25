@@ -117,6 +117,18 @@ const getListPatientForDoctor = async (req, res) => {
         });
     }
 };
+const sendRemedy = async (req, res) => {
+    try {
+        let info = await doctorService.sendRemedy(req.body);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e);
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from server...',
+        });
+    }
+};
 
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
@@ -127,6 +139,6 @@ module.exports = {
     getScheduleByDate: getScheduleByDate,
     getExtraInfoDoctorById: getExtraInfoDoctorById,
     getProfileDoctorById: getProfileDoctorById,
-
+    sendRemedy,
     getListPatientForDoctor,
 };
