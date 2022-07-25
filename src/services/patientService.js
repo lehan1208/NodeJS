@@ -12,7 +12,16 @@ const buildUrlEmail = (doctorId, token) => {
 const postBookAppointment = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName) {
+            if (
+                !data.email ||
+                !data.doctorId ||
+                !data.timeType ||
+                !data.date ||
+                !data.fullName ||
+                !data.selectedGender ||
+                !data.address ||
+                !data.phoneNumber
+            ) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing required parameters',
@@ -35,6 +44,10 @@ const postBookAppointment = (data) => {
                     defaults: {
                         email: data.email, // nếu không có thì rơi vao default để tạo mới data.email
                         roleId: 'R3', // truyền thêm roleId của patient
+                        gender: data.selectedGender,
+                        address: data.address,
+                        firstName: data.fullName,
+                        phoneNumber: data.phoneNumber,
                     },
                 });
 
